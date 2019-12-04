@@ -1,18 +1,42 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const mongoose = require('mongoose');
+const cors = require('cors');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
 
-var app = express();
+require('./authenticate/passport');
+
+const app = express();
+
+//connect to mongodb
+const connectString = 'mongodb+srv://baodang:baodang0305@cluster0-9tvmg.mongodb.net/webnc-looking-tutors';
+mongoose.Promise = Promise;
+const option = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  autoReconnect: true,
+  reconnectTries: 1000000,
+  reconnectInterval: 3000
+};
+
+const run = async() => {
+  await mongoose.connect(connectString, option, function(err){
+    if(err) console.log(err);
+    console.log('mongodb is connected');
+  })
+}
+run().catch(error => console.log(error));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
+app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
