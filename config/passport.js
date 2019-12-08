@@ -4,21 +4,27 @@ const passportJWT = require('passport-jwt');
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 
-const {checkUser, userModel} = require('../models/user');
+const {userModel} = require('../models/user');
 
 passport.use(new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password'
     },
-    function(email, password, cb){
-        return checkUser(email, password)
-            .then(result=> {
-                if(!result){
-                    return cb(null, false, {message: 'email hoặc mật khẩu không đúng'});
-                }
-                return cb(null, email, {message: 'Đăng nhập thành công'});
-            })
-            .catch(err => cb(err));
+    async (email, password, cb) => {
+        try {
+            const result = await userModel.findOne({email, password});
+            if (!result) {
+                return cb(null, false, { message: 'Email hoặc mật khẩu không đúng' });
+            }
+            const user = {
+                email: result.email,
+                fullName: result.fullName
+            }
+            return cb(null, user, { message: 'Đăng nhập thành công' });
+        }
+        catch (err) {
+            return cb(err);
+        }
     })
 );
 

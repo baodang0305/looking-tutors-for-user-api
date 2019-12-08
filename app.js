@@ -9,7 +9,7 @@ const cors = require('cors');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 
-require('./authenticate/passport');
+require('./config/passport');
 
 const app = express();
 
@@ -18,10 +18,7 @@ const connectString = 'mongodb+srv://baodang:baodang0305@cluster0-9tvmg.mongodb.
 mongoose.Promise = Promise;
 const option = {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
-  autoReconnect: true,
-  reconnectTries: 1000000,
-  reconnectInterval: 3000
+  useUnifiedTopology: true
 };
 
 const run = async() => {
