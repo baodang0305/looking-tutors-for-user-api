@@ -18,7 +18,14 @@ passport.use(new LocalStrategy({
             }
             const user = {
                 email: result.email,
-                fullName: result.fullName
+                fullName: result.fullName,
+                address: result.address,
+                phoneNumber: result.phoneNumber,
+                discribe: result.discribe,
+                skills: result.skills,
+                role: result.role,
+                salary: result.salary,
+                image: result.image
             }
             return cb(null, user, { message: 'Đăng nhập thành công' });
         }

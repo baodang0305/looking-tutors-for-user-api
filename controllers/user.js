@@ -43,3 +43,11 @@ exports.login = function(req, res){
     })(req, res);
 }
 
+exports.getTeacherAll = function(req, res){
+    userModel.find({'role': 'teacher'})
+    .then(user => {
+        return res.status(200).json({user});
+    })
+    .catch(error => console.log(error));
+}
+
