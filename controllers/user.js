@@ -51,3 +51,14 @@ exports.getTeacherAll = function(req, res){
     .catch(error => console.log(error));
 }
 
+exports.profile = function(req, res, next){
+   passport.authenticate('jwt', {session: false}, (err, user)=>{
+       if(err){
+           return res.status(400).json(err);
+       }
+       else{
+           return res.status(200).json(user);
+       }
+   })(req, res, next);
+}
+
