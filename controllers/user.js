@@ -51,3 +51,48 @@ exports.getTeacherAll = function(req, res){
     .catch(error => console.log(error));
 }
 
+exports.updateProfile = function(req, res){
+    const {oldEmail, newUser} = req.body;
+    if(oldEmail !== newUser.email){
+        userModel.findOne({'email': newUser.email})
+        .then(exists => {
+            if(exists){
+                return res.status(400).json({'message': 'Email người dùng đã tồn tại'});
+            }
+            else{
+                userModel.useFindAndModify({'email': oldEmail}, {'fullName': newUser.fullName, 'email': newUser.email,
+                                            'address': newUser.address, 'phoneNumber': newUser.phoneNumber, 'discribe': newUser.discribe,
+                                            'skills': newUser.discribe}, function(error, user){
+                    if(error){
+                        return res.status(400).json({'message': 'Cập nhật thất bại'});
+                    }
+                    console.log(user);
+                    return res.status(200).json({'message': 'Cập nhật thành công'})
+                })
+            }
+        })
+    }
+    else{
+        userModel.findOneAndUpdate({'email': oldEmail}, {'fullName': newUser.fullName, 'email': newUser.email,
+                                    'address': newUser.address, 'phoneNumber': newUser.phoneNumber, 'discribe': newUser.discribe,
+                                    'skills': newUser.discribe}, function(error, user){
+            if(error){
+                return res.status(400).json({'message': 'Cập nhật thất bại'});
+            }
+            return res.status(200).json({'message': 'Cập nhật thành công'})
+        })
+    }
+    
+}
+
+exports.deleteSkill = function(req, res){
+    const {userEmail, skillItem} = req.body;
+    userModel.update({'email': userEmail}, {"$pull": {"skills": skillItem}}, function(error){
+        if(error){
+            return res.status(400).json({'message': 'Xóa thất bại'});
+        }
+        else{
+            return res.status(200).json({'message': 'Xóa thành công'});
+        }
+    })
+}

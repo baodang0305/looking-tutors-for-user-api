@@ -13,4 +13,8 @@ router.post('/login', userController.login);
 
 router.get('/get-teacher-all', userController.getTeacherAll);
 
+router.post('/update-profile', userController.updateProfile);
+
+router.post('/delete-skill-item', userController.deleteSkill);
+
 module.exports = router;
