@@ -13,6 +13,8 @@ router.post('/login', userController.login);
 
 router.get('/get-teacher-all', userController.getTeacherAll);
 
+router.get('/get-profile', userController.getProfile);
+
 router.post('/update-profile', userController.updateProfile);
 
 router.post('/delete-skill-item', userController.deleteSkill);

@@ -43,6 +43,16 @@ exports.login = function(req, res){
     })(req, res);
 }
 
+exports.getProfile = function(req, res){
+    passport.authenticate('jwt', {session: flase}, (err, user)=>{
+        if(err){
+            return res.status(400).json(err)
+        }
+        console.log(user);
+        return res.status(200).json(user);
+    })(req, res);
+}
+
 exports.getTeacherAll = function(req, res){
     userModel.find({'role': 'teacher'})
     .then(user => {

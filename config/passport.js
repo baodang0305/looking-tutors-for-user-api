@@ -40,6 +40,7 @@ passport.use(new JWTStrategy({
     secretOrKey: 'secret'
     },
     function(jwtPayload, cb){
+        console.log(jwtPayload)
         return userModel.findOne({'email': jwtPayload.email})
             .then(user => {
                 if(user){
