@@ -11,12 +11,16 @@ router.post('/sign-up', userController.signUp);
 
 router.post('/login', userController.login);
 
+router.get('/get-profile', userController.getProfile);
+
 router.get('/get-teacher-all', userController.getTeacherAll);
 
 router.get('/get-profile', userController.getProfile);
 
 router.post('/update-profile', userController.updateProfile);
 
-router.post('/delete-skill-item', userController.deleteSkill);
+router.post('/delete-skill', userController.deleteSkill);
+
+router.post('/add-skill', userController.addSkill);
 
 module.exports = router;

@@ -38,19 +38,24 @@ exports.login = function(req, res){
                 res.send(err);
             }
             const token = jwt.sign(user, "secret");
+            console.log(token)
             return res.status(200).json({user, message, token});
         })
     })(req, res);
 }
 
-exports.getProfile = function(req, res){
-    passport.authenticate('jwt', {session: flase}, (err, user)=>{
+exports.getProfile = function(req, res, next) {
+    passport.authenticate('jwt', {session: false}, (err, user, info)=>{
         if(err){
-            return res.status(400).json(err)
+            console.log(err);
+            return res.status(400).json(err);
         }
-        console.log(user);
+        else if(info){
+            console.log(info)
+            return res.status(400).json({message: info.message});
+        }
         return res.status(200).json(user);
-    })(req, res);
+    })(req, res, next);
 }
 
 exports.getTeacherAll = function(req, res){
@@ -72,7 +77,7 @@ exports.updateProfile = function(req, res){
             else{
                 userModel.useFindAndModify({'email': oldEmail}, {'fullName': newUser.fullName, 'email': newUser.email,
                                             'address': newUser.address, 'phoneNumber': newUser.phoneNumber, 'discribe': newUser.discribe,
-                                            'skills': newUser.discribe}, function(error, user){
+                                            'skills': newUser.skills}, function(error, user){
                     if(error){
                         return res.status(400).json({'message': 'Cập nhật thất bại'});
                     }
@@ -84,8 +89,8 @@ exports.updateProfile = function(req, res){
     }
     else{
         userModel.findOneAndUpdate({'email': oldEmail}, {'fullName': newUser.fullName, 'email': newUser.email,
-                                    'address': newUser.address, 'phoneNumber': newUser.phoneNumber, 'discribe': newUser.discribe,
-                                    'skills': newUser.discribe}, function(error, user){
+                                    'address': newUser.address, 'phoneNumber': newUser.phoneNumber, 'discribe': newUser.discribe
+                                }, function(error){
             if(error){
                 return res.status(400).json({'message': 'Cập nhật thất bại'});
             }
@@ -103,6 +108,18 @@ exports.deleteSkill = function(req, res){
         }
         else{
             return res.status(200).json({'message': 'Xóa thành công'});
+        }
+    })
+}
+
+exports.addSkill = function(req, res){
+    const {userEmail, skill} = req.body;
+    userModel.update({'email': userEmail}, {"$push": {"skills": skill}}, function(error){
+        if(error){
+            return res.status(400).json({'message': 'Thêm thất bại'});
+        }
+        else{
+            return res.status(200).json({'message': 'Thêm thành công'});
         }
     })
 }
