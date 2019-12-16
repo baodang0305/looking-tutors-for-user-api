@@ -123,3 +123,4 @@ exports.addSkill = function(req, res){
         }
     })
 }
+
