@@ -77,7 +77,7 @@ exports.updateProfile = function(req, res){
             else{
                 userModel.useFindAndModify({'email': oldEmail}, {'fullName': newUser.fullName, 'email': newUser.email,
                                             'address': newUser.address, 'phoneNumber': newUser.phoneNumber, 'discribe': newUser.discribe,
-                                            'skills': newUser.skills}, function(error, user){
+                                            'skills': newUser.skills, 'userImg': newUser.userImg}, function(error, user){
                     if(error){
                         return res.status(400).json({'message': 'Cập nhật thất bại'});
                     }
