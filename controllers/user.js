@@ -38,7 +38,6 @@ exports.login = function(req, res){
                 res.send(err);
             }
             const token = jwt.sign(user, "secret");
-            console.log(token)
             return res.status(200).json({user, message, token});
         })
     })(req, res);
@@ -47,23 +46,13 @@ exports.login = function(req, res){
 exports.getProfile = function(req, res, next) {
     passport.authenticate('jwt', {session: false}, (err, user, info)=>{
         if(err){
-            console.log(err);
             return res.status(400).json(err);
         }
         else if(info){
-            console.log(info)
             return res.status(400).json({message: info.message});
         }
         return res.status(200).json(user);
     })(req, res, next);
-}
-
-exports.getTeacherAll = function(req, res){
-    userModel.find({'role': 'teacher'})
-    .then(user => {
-        return res.status(200).json({user});
-    })
-    .catch(error => console.log(error));
 }
 
 exports.updateProfile = function(req, res){
@@ -76,12 +65,11 @@ exports.updateProfile = function(req, res){
             }
             else{
                 userModel.useFindAndModify({'email': oldEmail}, {'fullName': newUser.fullName, 'email': newUser.email,
-                                            'address': newUser.address, 'phoneNumber': newUser.phoneNumber, 'discribe': newUser.discribe,
-                                            'skills': newUser.skills, 'userImg': newUser.userImg}, function(error, user){
+                                            'address': newUser.address, 'phoneNumber': newUser.phoneNumber, 
+                                            'discribe': newUser.discribe, 'userImg': newUser.userImg, 'salary': newUser.salary}, function(error, user){
                     if(error){
                         return res.status(400).json({'message': 'Cập nhật thất bại'});
                     }
-                    console.log(user);
                     return res.status(200).json({'message': 'Cập nhật thành công'})
                 })
             }
@@ -89,8 +77,8 @@ exports.updateProfile = function(req, res){
     }
     else{
         userModel.findOneAndUpdate({'email': oldEmail}, {'fullName': newUser.fullName, 'email': newUser.email,
-                                    'address': newUser.address, 'phoneNumber': newUser.phoneNumber, 'discribe': newUser.discribe
-                                }, function(error){
+                                    'address': newUser.address, 'phoneNumber': newUser.phoneNumber, 'discribe': newUser.discribe,
+                                    'userImg': newUser.userImg, 'salary': newUser.salary}, function(error){
             if(error){
                 return res.status(400).json({'message': 'Cập nhật thất bại'});
             }
@@ -122,5 +110,30 @@ exports.addSkill = function(req, res){
             return res.status(200).json({'message': 'Thêm thành công'});
         }
     })
+}
+
+
+exports.getTeacherAll = function(req, res){
+    userModel.find({'role': 'teacher'})
+    .then(user => {
+        return res.status(200).json({user});
+    })
+    .catch(error => console.log(error));
+}
+
+exports.getTeacherWithAddress = function(req, res){
+    const {address} = req.body;
+    console.log(address)
+    const regex = new RegExp(address, 'gi')
+    userModel.find({'role': 'teacher', 'address': regex})
+    .then(user => {
+        if(user){
+            return res.status(200).json({user});
+        }
+        else{
+            return res.status(200).json({message: 'Không tìm thấy user có địa chỉ này'})
+        }
+    })
+    .catch(error => console.log(error));
 }
 
