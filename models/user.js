@@ -13,7 +13,11 @@ const user = new Schema({
     discribe: String,
     salary: Number,
     skills: [],
-    active: Boolean
+    typeAccount: String,
+    active:{
+        type: String,
+        default: 'True'
+    }
 
 }, { collection: 'user'});
 

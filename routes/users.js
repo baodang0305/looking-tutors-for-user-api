@@ -25,8 +25,10 @@ router.get('/get-profile', userController.getProfile);
 
 router.post('/update-profile', userController.updateProfile);
 
-router.post('/delete-skill', userController.deleteSkill);
+router.post('/delete-skill', userController.delete);
 
 router.post('/add-skill', userController.addSkill);
+
+router.post('/check-to-signup-or-login', userController.checkToSignUpOrLogin);
 
 module.exports = router;
