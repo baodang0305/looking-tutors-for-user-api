@@ -12,7 +12,12 @@ const user = new Schema({
     phoneNumber: String,
     discribe: String,
     salary: Number,
-    skills: []
+    skills: [],
+    typeAccount: String,
+    active:{
+        type: String,
+        default: 'True'
+    }
 
 }, { collection: 'user'});
 

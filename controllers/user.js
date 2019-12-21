@@ -15,7 +15,8 @@ exports.signUp = async(req, res) => {
         email: email,
         // password: hassPassword,
         password: password,
-        role: role
+        role: role,
+        typeAccount: 'Normal'
     }
     userModel.create(user, function(err){
         if(err){
@@ -25,6 +26,37 @@ exports.signUp = async(req, res) => {
     });
     return res.status(200).json({message: 'đăng kí thành công'});
 }
+
+//Check type account Google or Facebook is exist to decide sign up or login
+exports.checkToSignUpOrLogin = async(req, res) => {
+    const {fullName, email, password, userImg, typeAccount} = req.body;
+    const user = {
+        fullName: fullName,
+        email: email,
+        password: password,
+        role: '',
+        userImg: userImg,
+        typeAccount: typeAccount
+    }
+    const result = await userModel.findOne({email: email});
+    if(!result){
+        userModel.create(user, function(err){
+            if(err){
+                console.log(err);
+                return res.status(400).json({err});
+            }
+        });
+    }
+    else{
+        console.log("Có tồn tại");
+        user.role = result.role;
+    }   
+   
+    const token = jwt.sign(user, "secret");
+    return res.status(200).json({user, token});
+  
+}
+
 
 exports.login = function(req, res){
     passport.authenticate('local', {session: false}, (err, user, message) => {
@@ -88,7 +120,7 @@ exports.updateProfile = function(req, res){
     
 }
 
-exports.deleteSkill = function(req, res){
+exports.delete = function(req, res){
     const {userEmail, skillItem} = req.body;
     userModel.update({'email': userEmail}, {"$pull": {"skills": skillItem}}, function(error){
         if(error){
