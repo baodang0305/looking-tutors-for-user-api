@@ -123,7 +123,6 @@ exports.getTeacherAll = function(req, res){
 
 exports.getTeacherWithAddress = function(req, res){
     const {address} = req.body;
-    console.log(address)
     const regex = new RegExp(address, 'gi')
     userModel.find({'role': 'teacher', 'address': regex})
     .then(user => {
@@ -131,7 +130,35 @@ exports.getTeacherWithAddress = function(req, res){
             return res.status(200).json({user});
         }
         else{
-            return res.status(200).json({message: 'Không tìm thấy user có địa chỉ này'})
+            return res.status(200).json({message: 'Không tìm thấy teacher có địa chỉ này'})
+        }
+    })
+    .catch(error => console.log(error));
+}
+
+exports.getTeacherWithSalary = function(req, res){
+    const {salary} = req.body;
+    userModel.find({'role': 'teacher', 'salary': salary})
+    .then(user => {
+        if(user){
+            return res.status(200).json({user});
+        }
+        else{
+            return res.status(200).json({message: 'Không tìm thấy teacher có lương này'})
+        }
+    })
+    .catch(error => console.log(error));
+}
+
+exports.getTeacherWithSkill = function(req, res){
+    const {skill} = req.body;
+    userModel.find({'role': 'teacher', 'skills': skill})
+    .then(user => {
+        if(user){
+            return res.status(200).json({user});
+        }
+        else{
+            return res.status(200).json({message: 'Không tìm thấy teacher có lương này'})
         }
     })
     .catch(error => console.log(error));

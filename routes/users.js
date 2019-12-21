@@ -17,6 +17,10 @@ router.get('/get-teacher-all', userController.getTeacherAll);
 
 router.post('/get-teacher-with-address', userController.getTeacherWithAddress);
 
+router.post('/get-teacher-with-salary', userController.getTeacherWithSalary);
+
+router.post('/get-teacher-with-skill', userController.getTeacherWithSkill);
+
 router.get('/get-profile', userController.getProfile);
 
 router.post('/update-profile', userController.updateProfile);

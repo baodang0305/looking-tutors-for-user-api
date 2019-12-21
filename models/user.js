@@ -12,7 +12,8 @@ const user = new Schema({
     phoneNumber: String,
     discribe: String,
     salary: Number,
-    skills: []
+    skills: [],
+    active: Boolean
 
 }, { collection: 'user'});
 
