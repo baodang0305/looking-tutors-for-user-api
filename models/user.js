@@ -18,7 +18,7 @@ const user = new Schema({
         type: String,
         default: 'True'
     }
-
+// làm gì làm đi.
 }, { collection: 'user'});
 
 const userModel = mongoose.model('userModel', user);
