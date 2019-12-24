@@ -39,4 +39,6 @@ router.post('/add-new-course', userController.addNewCourse);
 
 router.get('/get-all-courses', userController.getAllCourses);
 
+router.put('/update-info', userController.update_info);
+
 module.exports = router;
