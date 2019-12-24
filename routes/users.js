@@ -31,4 +31,12 @@ router.post('/add-skill', userController.addSkill);
 
 router.post('/check-to-signup-or-login', userController.checkToSignUpOrLogin);
 
+router.post('/send-code-activated-account-by-email', userController.sendCodeActivatedAccountByEmail);
+
+router.post('/activated-account', userController.activatedAccount);
+
+router.post('/add-new-course', userController.addNewCourse);
+
+router.get('/get-all-courses', userController.getAllCourses);
+
 module.exports = router;

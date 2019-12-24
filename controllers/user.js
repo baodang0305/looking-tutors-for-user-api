@@ -1,7 +1,9 @@
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 // const bcrypt = require('bcrypt');
 const {userModel} = require('../models/user');
+const {courseModel} = require('../models/course');
 
 exports.signUp = async(req, res) => {
     const {fullName, email, password, role} = req.body;
@@ -16,7 +18,8 @@ exports.signUp = async(req, res) => {
         // password: hassPassword,
         password: password,
         role: role,
-        typeAccount: 'Normal'
+        typeAccount: 'Normal',
+        active: false
     }
     userModel.create(user, function(err){
         if(err){
@@ -24,7 +27,7 @@ exports.signUp = async(req, res) => {
         }
         console.log("create account is success");
     });
-    return res.status(200).json({message: 'đăng kí thành công'});
+    return res.status(200).json({message: 'đăng kí thành công, mã kích hoạt tài khoản sẽ được gửi về mail đã đăng kí'});
 }
 
 //Check type account Google or Facebook is exist to decide sign up or login
@@ -144,7 +147,6 @@ exports.addSkill = function(req, res){
     })
 }
 
-
 exports.getTeacherAll = function(req, res){
     userModel.find({'role': 'teacher'})
     .then(user => {
@@ -195,4 +197,77 @@ exports.getTeacherWithSkill = function(req, res){
     })
     .catch(error => console.log(error));
 }
+
+exports.sendCodeActivatedAccountByEmail = function(req, res){
+    // const transporter = nodemailer.createTransport({
+    //     service: 'Gmail',
+    //     auth: {
+    //       user: 'baodang3597@gmail.com',
+    //       pass: 'baodang0305'
+    //     }
+    // });
+    // const mailOptions = {
+    //     from: 'Bao Dang',
+    //     to: req.body.email,
+    //     subject: 'Confirm changes password',
+    //     html: '<b>Vui lòng nhập mã xác nhận 12345</b>'
+    // }
+    // transporter.sendMail(mailOptions, function(err, info){
+    //     if(err){
+    //         console.log(err)
+    //         return res.status(400).json({'message': 'Gửi mã code kích hoạt thất bại'});
+    //     }
+    //     else{
+    //         return res.status(200).json({'message': 'Mã code kích hoạt tài khoản đã được gửi đến mail của bạn'})
+    //     }
+    // });
+}
+
+exports.activatedAccount = function(req, res){
+    const {email, code} = req.body;
+    if(req.body.code === '12345'){
+        userModel.useFindAndModify({'email': req.body.email}, {'active': true})
+        .then(result => {
+            if(result){
+                return res.status(200).json({'message': 'Tài khoản đã được kích hoạt'});
+            }
+            else{
+                return res.status(400).json({'message': 'Kích hoạt tài khoản thất bại'})
+            }
+        })
+    }
+    else{
+        return res.status(400).json({'message': 'Mã kích hoạt không đúng'});
+    }
+}
+
+exports.addNewCourse = function(req, res){
+    const {newCourse, ownerCourse} = req.body;
+    const course = {
+        nameCourse: newCourse.nameCourse,
+        salary: newCourse.salary,
+        address: newCourse.address,
+        time: newCourse.time,
+        discribe: newCourse.discribe,
+        email: ownerCourse.email,
+        fullName: ownerCourse.fullName,
+        phoneNumber: ownerCourse.phoneNumber
+    }
+    courseModel.create(course, function(err){
+        if(err){
+            return console.log(err);
+        }
+        console.log("create course is success");
+    });
+    return res.status(200).json({message: 'Tạo khóa học thành công'});
+}
+
+exports.getAllCourses = function(req, res){
+    courseModel.find({})
+    .then(courses => {
+        return res.status(200).json(courses);
+    })
+    .catch(error => console.log(error));
+}
+
 

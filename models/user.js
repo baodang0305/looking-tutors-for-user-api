@@ -15,14 +15,11 @@ const user = new Schema({
     skills: [],
     typeAccount: String,
     active:{
-        type: String,
-        default: 'True'
+        default: false
     }
-// làm gì làm đi.
 }, { collection: 'user'});
 
 const userModel = mongoose.model('userModel', user);
-
 
 module.exports = {
     userModel
