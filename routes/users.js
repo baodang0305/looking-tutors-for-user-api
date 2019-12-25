@@ -41,4 +41,8 @@ router.get('/get-all-courses', userController.getAllCourses);
 
 router.put('/update-info', userController.update_info);
 
+router.put('/update-role', userController.update_role);
+
+router.put('/change-password', userController.change_password);
+
 module.exports = router;

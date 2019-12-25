@@ -2,14 +2,15 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 // const bcrypt = require('bcrypt');
-const {userModel, updateInfo} = require('../models/user');
+const {userModel, updateInfo, updateRole, changePassword} = require('../models/user');
 const {courseModel} = require('../models/course');
 
 exports.signUp = async(req, res) => {
     const {fullName, email, password, role} = req.body;
     const result = await userModel.findOne({email: email});
     if(result){
-        return res.status(400).json({message: 'email đã tồn tại'});
+        console.log('email da ton tai');
+        return res.status(400).json({message: 'Email đã tồn tại'});
     }
     // const hassPassword = await bcrypt.hash(password, '10');
     const user = {
@@ -23,11 +24,11 @@ exports.signUp = async(req, res) => {
     }
     userModel.create(user, function(err){
         if(err){
-            return console.log(err);
+            return res.status(400).json({message: err});
         }
         console.log("create account is success");
     });
-    return res.status(200).json({message: 'đăng kí thành công, mã kích hoạt tài khoản sẽ được gửi về mail đã đăng kí'});
+    return res.status(200).json({message: 'Đăng ký thành công'});
 }
 
 //Check type account Google or Facebook is exist to decide sign up or login
@@ -46,7 +47,7 @@ exports.checkToSignUpOrLogin = async(req, res) => {
         userModel.create(user, function(err){
             if(err){
                 console.log(err);
-                return res.status(400).json({err});
+                return res.status(400).json({error: err});
             }
         });
     }
@@ -69,6 +70,7 @@ exports.login = function(req, res){
                 message
             });
         }
+        console.log(user);
         req.login(user, {session: false}, (err)=>{
             if(err){
                 res.send(err);
@@ -153,6 +155,60 @@ exports.update_info = (req, res, next) => {
       }
     })(req, res, next);
   };
+
+  //Update info of user
+exports.update_role = (req, res, next) => {
+    passport.authenticate("jwt", { session: false }, async (err, user, info) => {
+      if (err) {
+        return res.status(400).json({
+          error: err
+        });
+      }
+  
+      if (info) {
+        return res.status(400).json({
+          message: info.message
+        });
+      } else {
+        const { role } = req.body;
+        console.log(role);
+        if (role === '') {
+          return res.status(400).json({
+            message: "Vui lòng chọn loại tài khoản"
+          });
+        }
+        updateRole(user.email, role, res);
+      }
+    })(req, res, next);
+  };
+    //Update info of user
+exports.change_password = (req, res, next) => {
+    passport.authenticate("jwt", { session: false }, async (err, user, info) => {
+      if (err) {
+        return res.status(400).json({
+          error: err
+        });
+      }
+  
+      if (info) {
+        return res.status(400).json({
+          message: info.message
+        });
+      } else {
+        const { newPassword, oldPassword } = req.body;
+        console.log("old " + oldPassword);
+        console.log("new " + newPassword);
+        console.log(user.username);
+        if (!newPassword || !oldPassword) {
+            return res.status(400).json({
+                message: "Vui lòng điền đủ thông tin"
+            });
+        }
+        changePassword(user.email, user.password, newPassword, oldPassword, res);
+      }
+    })(req, res, next);
+  };
+
 
 
 exports.delete = function(req, res){

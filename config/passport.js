@@ -25,7 +25,9 @@ passport.use(new LocalStrategy({
                 skills: result.skills,
                 role: result.role,
                 salary: result.salary,
-                userImg: result.userImg
+                userImg: result.userImg,
+                typeAccount: result.typeAccount,
+                active: result.active
             }
             return cb(null, user, { message: 'Đăng nhập thành công' });
         }
