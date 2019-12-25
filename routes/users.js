@@ -37,6 +37,20 @@ router.post('/activated-account', userController.activatedAccount);
 
 router.post('/add-new-course', userController.addNewCourse);
 
-router.get('/get-all-courses', userController.getAllCourses);
+router.post('/teacher-get-all-courses-no-request', userController.teacherGetAllCoursesNoRequest);
+
+router.post('/teacher-requesting-received-teach-course', userController.teacherRequestingReceivedTeachCourse);
+
+router.post('/teacher-get-all-courses-requesting-teach', userController.teacherGetAllCoursesRequestingTeach);
+
+router.post('/teacher-get-all-courses-requesting-received-teach', userController.teacherGetAllCoursesRequestingReceivedTeach);
+
+router.post('/teacher-cancel-requesting-received-teach', userController.teacherCancelRequestingReceivedTeach);
+
+router.post('/student-get-all-courses-requesting-received-teach', userController.studentGetAllCoursesRequestingReceivedTeach);
+
+router.post('/student-get-all-courses-no-received', userController.studentGetAllCoursesNoReceived);
+
+router.post('/student-requesting-teach-course', userController.studentRequestingTeachCourse);
 
 module.exports = router;

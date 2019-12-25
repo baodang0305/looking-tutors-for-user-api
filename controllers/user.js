@@ -249,9 +249,10 @@ exports.addNewCourse = function(req, res){
         address: newCourse.address,
         time: newCourse.time,
         discribe: newCourse.discribe,
-        email: ownerCourse.email,
-        fullName: ownerCourse.fullName,
-        phoneNumber: ownerCourse.phoneNumber
+        emailOwner: ownerCourse.email,
+        fullNameOwner: ownerCourse.fullName,
+        phoneNumberOwner: ownerCourse.phoneNumber,
+        imageOwner: ownerCourse.userImg
     }
     courseModel.create(course, function(err){
         if(err){
@@ -262,12 +263,114 @@ exports.addNewCourse = function(req, res){
     return res.status(200).json({message: 'Tạo khóa học thành công'});
 }
 
-exports.getAllCourses = function(req, res){
-    courseModel.find({})
+exports.teacherGetAllCoursesNoRequest = function(req, res){
+    const {teacher} = req.body;
+    courseModel.find({'emailRequestedPerson': {$nin: [teacher.email]}, 'emailRequestor': {$nin: [teacher.email]}})
     .then(courses => {
         return res.status(200).json(courses);
     })
     .catch(error => console.log(error));
 }
+
+exports.teacherRequestingReceivedTeachCourse = function(req, res){
+    const {idCourse, requestor, requestedPerson} = req.body;
+    courseModel.findOneAndUpdate({'_id': idCourse}, {'emailRequestor': requestor.email,
+                                                     'fullNameRequestor': requestor.fullName,
+                                                     'phoneNumberRequestor': requestor.phoneNumber,
+                                                     'emailRequestedPerson': requestedPerson.email,
+                                                     'fullNameRequestedPerson': requestedPerson.fullName,
+                                                     'phoneNumberRequestedPerson': requestedPerson.phoneNumber})
+    .then(result => {
+        if(result){
+            return res.status(200).json(`${requestor.email} gửi yêu cầu dạy đến ${requestedPerson.email} thành công.`);
+        }
+        else{
+            return res.status(400).json(`${requestor.email} gửi yêu cầu dạy đến ${requestedPerson.email} thất bại.`)
+        }
+    })
+}
+
+exports.teacherCancelRequestingReceivedTeach = function(req, res){
+    const {idCourse} = req.body;
+    courseModel.findOneAndUpdate({'_id': idCourse},{'emailRequestor': null,
+                                                    'fullNameRequestor': null,
+                                                    'phoneNumberRequestor': null,
+                                                    'emailRequestedPerson': null,
+                                                    'fullNameRequestedPerson': null,
+                                                    'phoneNumberRequestedPerson': null})
+    .then(result => {
+        if(result){
+            return res.status(200).json('Hủy yêu cầu nhận dạy thành công');
+        }
+        else{
+            return res.status(400).json(`Hủy yêu cầu nhận dạy thất bại.`)
+        }
+    })
+}
+
+exports.teacherGetAllCoursesRequestingTeach = function(req, res){
+    const {teacher} = req.body;
+    courseModel.find({'emailRequestedPerson': teacher.email})
+    .then(courses => {
+        if(courses){
+            return res.status(200).json(courses);
+        }
+        return res.status(400).json("Không tìm thấy khóa học đang yêu cầu");
+    })
+}
+
+exports.teacherGetAllCoursesRequestingReceivedTeach = function(req, res){
+    const {teacher} = req.body;
+    courseModel.find({'emailRequestor': teacher.email})
+    .then(courses => {
+        if(courses){
+            return res.status(200).json(courses);
+        }
+        return res.status(400).json("Không tìm thấy khóa học đang yêu cầu nhận dạy");
+    })
+}
+
+exports.studentGetAllCoursesRequestingReceivedTeach = function(req, res){
+    const {student} = req.body;
+    courseModel.find({'emailOwner': student.email, 'emailRequestor': {$nin: [student.email, '', null, undefined]}})
+    .then(courses => {
+        if(courses){
+            return res.status(200).json(courses)
+        }
+        return res.status(400).json('Không tìm thấy khóa học đang được yêu cầu nhận dạy')
+    })
+}
+
+exports.studentGetAllCoursesNoReceived = function(req, res){
+    const {requestor} = req.body;
+    courseModel.find({'emailOwner': requestor.email})
+    .then(courses => {
+        if(courses){
+            console.log(courses)
+            return res.status(200).json(courses)
+        }
+        return res.status(400).json('Không tìm thấy khóa học nào');
+    })
+
+}
+
+exports.studentRequestingTeachCourse = function(req, res){
+    const {idCourse, student, teacher} = req.body;
+    courseModel.findOneAndUpdate({'_id': idCourse}, {'emailRequestor': student.email, 
+                                                     'fullNameRequestor': student.fullName,
+                                                     'phoneNumberRequestor': student.phoneNumber,
+                                                     'emailRequestedPerson': teacher.email,
+                                                     'fullNameRequestedPerson': teacher.fullName,
+                                                     'phoneNumberRequestedPerson': teacher.phoneNumber})
+    .then(result => {
+        if(result){
+            return res.status(200).json(`${student.email} gửi yêu cầu dạy đến ${teacher.email} thành công.`);
+        }
+        else{
+            return res.status(400).json(`${student.email} gửi yêu cầu dạy đến ${teacher.email} thất bại.`)
+        }
+    })
+}
+
 
 
