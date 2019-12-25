@@ -2,7 +2,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 // const bcrypt = require('bcrypt');
-const {userModel} = require('../models/user');
+const {userModel, updateInfo} = require('../models/user');
 const {courseModel} = require('../models/course');
 
 exports.signUp = async(req, res) => {
@@ -64,16 +64,21 @@ exports.checkToSignUpOrLogin = async(req, res) => {
 exports.login = function(req, res){
     passport.authenticate('local', {session: false}, (err, user, message) => {
         if(err || !user){
+            console.log(err);
             return res.status(400).json({
                 message
-            })
+            });
         }
         req.login(user, {session: false}, (err)=>{
             if(err){
                 res.send(err);
             }
             const token = jwt.sign(user, "secret");
-            return res.status(200).json({user, message, token});
+            return res.status(200).json({
+                user,
+                message, 
+                token
+            });
         })
     })(req, res);
 }
@@ -122,6 +127,33 @@ exports.updateProfile = function(req, res){
     }
     
 }
+
+//Update info of user
+exports.update_info = (req, res, next) => {
+    passport.authenticate("jwt", { session: false }, async (err, user, info) => {
+      if (err) {
+        return res.status(400).json({
+          error: err
+        });
+      }
+  
+      if (info) {
+        return res.status(400).json({
+          message: info.message
+        });
+      } else {
+        const { newUser } = req.body;
+        console.log(newUser);
+        if (newUser.fullName === '') {
+          return res.status(400).json({
+            message: "Vui lòng điền đủ thông tin"
+          });
+        }
+        updateInfo(user.email, newUser, res);
+      }
+    })(req, res, next);
+  };
+
 
 exports.delete = function(req, res){
     const {userEmail, skillItem} = req.body;

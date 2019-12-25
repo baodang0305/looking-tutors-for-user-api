@@ -53,4 +53,6 @@ router.post('/student-get-all-courses-no-received', userController.studentGetAll
 
 router.post('/student-requesting-teach-course', userController.studentRequestingTeachCourse);
 
+router.put('/update-info', userController.update_info);
+
 module.exports = router;

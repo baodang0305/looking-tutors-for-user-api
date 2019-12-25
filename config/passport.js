@@ -25,7 +25,7 @@ passport.use(new LocalStrategy({
                 skills: result.skills,
                 role: result.role,
                 salary: result.salary,
-                image: result.image
+                userImg: result.userImg
             }
             return cb(null, user, { message: 'Đăng nhập thành công' });
         }
@@ -40,11 +40,9 @@ passport.use(new JWTStrategy({
     secretOrKey: 'secret'
     },
     async(jwtPayload, cb) => {
-        console.log(jwtPayload)
         try {
             const user = await userModel.findOne({ 'email': jwtPayload.email });
             if (user) {
-                console.log(user)
                 return cb(null, user);
             }
         }
