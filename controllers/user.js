@@ -375,6 +375,7 @@ exports.studentGetAllCoursesRequestingReceivedTeach = function(req, res){
 
 exports.studentGetAllCoursesNoReceived = function(req, res){
     const {requestor} = req.body;
+    console.log(requestor)
     courseModel.find({'emailOwner': requestor.email})
     .then(courses => {
         if(courses){
