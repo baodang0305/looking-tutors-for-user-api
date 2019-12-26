@@ -59,4 +59,16 @@ router.put('/update-role', userController.update_role);
 
 router.put('/change-password', userController.change_password);
 
+router.post('/student-create-contract', userController.studentCreateContract);
+
+router.post('/student-checkout', userController.checkout);
+
+router.post('/student-get-all-contract', userController.studentGetAllContract);
+
+router.post('/teacher-get-all-contract-offer', userController.teacherGetAllContractOffer);
+
+router.post('/teacher-cancel-contract', userController.teacherCancelContract);
+
+router.post('/teacher-accept-contract', userController.teacherAcceptContract);
+
 module.exports = router;

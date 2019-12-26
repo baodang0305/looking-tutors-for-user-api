@@ -1,9 +1,12 @@
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
+// const nodemailer = require('nodemailer');
+const stripe = require('stripe')('sk_test_cYmuj2bLSojoUobO6f98sCnE00VVt5m4Ay');
 // const bcrypt = require('bcrypt');
 const {userModel, updateInfo, updateRole, changePassword} = require('../models/user');
 const {courseModel} = require('../models/course');
+const {contractModel} = require('../models/contract');
+const {buillModel} = require('../models/buill');
 
 exports.signUp = async(req, res) => {
     const {fullName, email, password, role} = req.body;
@@ -208,8 +211,6 @@ exports.change_password = (req, res, next) => {
       }
     })(req, res, next);
   };
-
-
 
 exports.delete = function(req, res){
     const {userEmail, skillItem} = req.body;
@@ -461,5 +462,93 @@ exports.studentRequestingTeachCourse = function(req, res){
     })
 }
 
+exports.studentCreateContract = function(req, res){
+    const {contract} = req.body;
 
+    contractModel.create(contract)
+    .then(result => {
+        if(result){
+            return res.status(200).json("Tạo hợp đồng thành công");
+        }
+        return res.status(400).json("Tạo hợp đồng thất bại");
+    })
+}
 
+exports.checkout = (req, res) => {
+  
+    const {token, contract} = req.body;
+    console.log(contract._id)
+    stripe.customers.create({
+      email: token.email,
+      source: token.id,
+      description: 'customer'
+    })
+    .then(customer => stripe.charges.create({
+      amount: '2500',
+      description: 'payment for tutors',
+      currency: 'usd',
+      customer: customer.id,
+      receipt_email: token.email
+    }))
+    .then(charge => { 
+        const buill = {
+            amount: charge.amount,
+            email: charge.billing_details.name,
+            month: charge.payment_method_details.card.exp_month,
+            year: charge.payment_method_details.card.exp_year
+        }
+        buillModel.create(buill, function(err){
+            if(!err){
+                contractModel.findOneAndUpdate({'_id': contract._id}, {"checkout": true})
+                .then(result => {
+                    if(result){
+                        return res.status(200).json("Thanh toán thành công")
+                    }
+                })
+            }
+        })
+    })
+    .catch(err => {console.log(err)});
+  
+};
+
+exports.studentGetAllContract = function(req, res){
+    const {student} = req.body;
+    contractModel.find({'emailStudent': student.email})
+    .then(contracts => {
+        if(contracts){
+            return res.status(200).json(contracts)
+        }
+    })
+
+}
+
+exports.teacherGetAllContractOffer = function(req, res){
+    const {teacher} = req.body;
+    contractModel.find({'emailTeacher': teacher.email})
+    .then(contracts => {
+        if(contracts){
+            return res.status(200).json(contracts)
+        }
+    })
+}
+
+exports.teacherCancelContract = function(req, res){
+    const {contract} = req.body;
+    contractModel.findOneAndDelete({'_id': contract._id})
+    .then(result => {
+        if(result){
+            return res.status(200).json('Hủy yêu cầu thành công');
+        }
+    })
+}
+
+exports.teacherAcceptContract = function(req, res){
+    const {contract} = req.body;
+    contractModel.findOneAndUpdate({'_id': contract._id}, {'acceptTeacher': true})
+    .then(result => {
+        if(result){
+            return res.status(200).json('Chấp nhận hợp đồng');
+        }
+    })
+}
